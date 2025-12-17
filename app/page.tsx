@@ -3,13 +3,23 @@
 import { useState } from "react";
 import MessageCard from "./components/message";
 
-interface Message {
+export interface Comment {
+  id: number;
+  user: string;
+  text: string;
+  createdAt: Date;
+}
+
+export interface Message {
   id: number;
   user: string;
   message: string;
   userPosition: string;
   likeCount: number;
   createdAt: Date;
+  categories: AdviceCategories;
+  linkedinUrl?: string;
+  comments?: Comment[];
 }
 
 const initialMessages: Message[] = [
@@ -21,6 +31,22 @@ const initialMessages: Message[] = [
     userPosition: "Senior Data Engineer",
     likeCount: 1,
     createdAt: new Date("2025-12-10"),
+    categories: "Coding",
+    linkedinUrl: "https://linkedin.com/in/datapro",
+    comments: [
+      {
+        id: 1,
+        user: "JuniorDev",
+        text: "Excellent conseil! J'ai appris ça à mes dépens 😅",
+        createdAt: new Date("2025-12-11"),
+      },
+      {
+        id: 2,
+        user: "DataLead",
+        text: "100% d'accord. La documentation c'est la base!",
+        createdAt: new Date("2025-12-12"),
+      },
+    ],
   },
   {
     id: 2,
@@ -30,6 +56,8 @@ const initialMessages: Message[] = [
     userPosition: "Data Analyst",
     likeCount: 2,
     createdAt: new Date("2025-12-15"),
+    categories: "Coding",
+    comments: [],
   },
   {
     id: 3,
@@ -39,9 +67,24 @@ const initialMessages: Message[] = [
     userPosition: "Machine Learning Engineer",
     likeCount: 0,
     createdAt: new Date("2025-12-17"),
+    categories: "Carreer",
+    linkedinUrl: "https://linkedin.com/in/mlexpert",
+    comments: [
+      {
+        id: 1,
+        user: "DataScientist",
+        text: "Tellement vrai! 80% du temps sur le nettoyage...",
+        createdAt: new Date("2025-12-17"),
+      },
+    ],
   },
 ];
 
+export type AdviceCategories =
+  | "Carreer"
+  | "Coding"
+  | "Design System"
+  | "Security";
 type SortOption = "most-liked" | "recent";
 type TimeLimit = "all-time" | "month";
 
@@ -49,33 +92,32 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [showForm, setShowForm] = useState(false);
   const [newMessage, setNewMessage] = useState("");
-  const [userName, setUserName] = useState("");
-  const [userPosition, setUserPosition] = useState("");
+  const [selectedCategory, setSelectedCategory] =
+    useState<AdviceCategories>("Coding");
   const [sortBy, setSortBy] = useState<SortOption>("most-liked");
-
   const [timeLimit, setTimeLimit] = useState<TimeLimit>("all-time");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!newMessage.trim() || !userName.trim()) {
+    if (!newMessage.trim()) {
       return;
     }
 
     const message: Message = {
       id: Date.now(),
-      user: userName,
+      user: "CurrentUser", // À remplacer par l'utilisateur connecté
       message: newMessage,
-      userPosition: userPosition || "Data Enthusiast",
+      userPosition: "Data Enthusiast", // À remplacer par le rôle de l'utilisateur
       likeCount: 0,
       createdAt: new Date(),
+      categories: selectedCategory,
     };
 
     setMessages([message, ...messages]);
 
     setNewMessage("");
-    setUserName("");
-    setUserPosition("");
+    setSelectedCategory("Coding");
     setShowForm(false);
   };
 
@@ -130,32 +172,23 @@ export default function Home() {
               Partager un nouveau conseil
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                    Nom *
-                  </label>
-                  <input
-                    type="text"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                    placeholder="Votre nom"
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                    Rôle
-                  </label>
-                  <input
-                    type="text"
-                    value={userPosition}
-                    onChange={(e) => setUserPosition(e.target.value)}
-                    placeholder="Data Engineer, Analyst..."
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  Catégorie *
+                </label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) =>
+                    setSelectedCategory(e.target.value as AdviceCategories)
+                  }
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent cursor-pointer"
+                  required
+                >
+                  <option value="Coding">Coding</option>
+                  <option value="Carreer">Carreer</option>
+                  <option value="Design System">Design System</option>
+                  <option value="Security">Security</option>
+                </select>
               </div>
 
               <div>
@@ -167,7 +200,7 @@ export default function Home() {
                   onChange={(e) => setNewMessage(e.target.value)}
                   placeholder="Partagez votre conseil..."
                   className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent resize-none"
-                  rows={3}
+                  rows={4}
                   required
                 />
               </div>
@@ -219,19 +252,34 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* Time Limit Dropdown */}
-              <select
-                value={timeLimit}
-                onChange={(e) => setTimeLimit(e.target.value as TimeLimit)}
-                className="px-3 py-1.5 text-sm font-medium bg-white text-slate-700 border border-slate-200 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent cursor-pointer"
-              >
-                <option value="all-time">Tout le temps</option>
-                <option value="month">Ce mois</option>
-              </select>
+              {/* Time Limit Buttons */}
+              <div className="flex gap-2 pl-5">
+                <button
+                  onClick={() => setTimeLimit("all-time")}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                    timeLimit === "all-time"
+                      ? "bg-slate-900 text-white"
+                      : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  Tout le temps
+                </button>
+                <button
+                  onClick={() => setTimeLimit("month")}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                    timeLimit === "month"
+                      ? "bg-slate-900 text-white"
+                      : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  Ce mois
+                </button>
+              </div>
             </div>
 
             <p className="text-sm text-slate-600">
-              {getSortedMessages().length} conseil{getSortedMessages().length > 1 ? "s" : ""}
+              {getSortedMessages().length} conseil
+              {getSortedMessages().length > 1 ? "s" : ""}
             </p>
           </div>
 
