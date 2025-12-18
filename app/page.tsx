@@ -1,7 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession, signOut } from "./lib/auth-client";
+import { useRouter } from "next/navigation";
 import MessageCard from "./components/message";
+import { Plus } from "lucide-react";
+
+interface StudentProfile {
+  id: number;
+  username: string;
+  position: string;
+  linkedinUrl: string | null;
+  gitHubUrl: string | null;
+}
 
 export interface Comment {
   id: number;
@@ -90,6 +101,11 @@ type SortOption = "most-liked" | "recent";
 type TimeLimit = "all-time" | "month";
 
 export default function Home() {
+  const { data: session, isPending } = useSession();
+  const router = useRouter();
+
+  const [studentProfile, setStudentProfile] = useState<StudentProfile | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [showForm, setShowForm] = useState(false);
   const [newMessage, setNewMessage] = useState("");
@@ -99,6 +115,39 @@ export default function Home() {
   const [sortBy, setSortBy] = useState<SortOption>("most-liked");
   const [timeLimit, setTimeLimit] = useState<TimeLimit>("all-time");
 
+  useEffect(() => {
+    const fetchStudentProfile = async () => {
+      if (!session?.user) {
+        setLoadingProfile(false);
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/student/me");
+        const data = await response.json();
+
+        if (data.student) {
+          setStudentProfile(data.student);
+        } else {
+          router.push("/onboarding");
+        }
+      } catch (error) {
+        console.error("Error fetching student profile:", error);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+
+    if (!isPending) {
+      fetchStudentProfile();
+    }
+  }, [session, isPending, router]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/sign-in");
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -106,15 +155,21 @@ export default function Home() {
       return;
     }
 
+    if (!session?.user || !studentProfile) {
+      router.push("/sign-in");
+      return;
+    }
+
     const message: Message = {
       id: Date.now(),
-      user: "CurrentUser", // À remplacer par l'utilisateur connecté
+      user: studentProfile.username,
       message: newMessage,
-      userPosition: "Data Enthusiast", // À remplacer par le rôle de l'utilisateur
+      userPosition: studentProfile.position,
       likeCount: 0,
       createdAt: new Date(),
       categories: selectedCategory,
       resourceUrl: resourceUrl.trim() || undefined,
+      linkedinUrl: studentProfile.linkedinUrl || undefined,
       comments: [],
     };
 
@@ -159,12 +214,39 @@ export default function Home() {
             <h1 className="text-xl font-bold text-slate-900">Wisdom Wall</h1>
             <p className="text-sm text-slate-500">Conseils Data</p>
           </div>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors"
-          >
-            {showForm ? "Fermer" : "Nouveau conseil"}
-          </button>
+          <div className="flex items-center gap-3">
+            {isPending || loadingProfile ? (
+              <div className="text-sm text-slate-500">Chargement...</div>
+            ) : session?.user && studentProfile ? (
+              <>
+                <span className="text-sm text-slate-600">
+                  Bonjour, {studentProfile.username}
+                </span>
+
+                <button
+                  onClick={handleSignOut}
+                  className="px-4 py-2 bg-white text-slate-700 text-sm font-medium rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+                >
+                  Déconnexion
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => router.push("/sign-in")}
+                  className="px-4 py-2 bg-white text-slate-700 text-sm font-medium rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+                >
+                  Se connecter
+                </button>
+                <button
+                  onClick={() => router.push("/sign-up")}
+                  className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors"
+                >
+                  Créer un compte
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </nav>
 
@@ -298,10 +380,23 @@ export default function Home() {
               </div>
             </div>
 
-            <p className="text-sm text-slate-600">
-              {getSortedMessages().length} conseil
-              {getSortedMessages().length > 1 ? "s" : ""}
-            </p>
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors"
+            >
+              {showForm ? (
+                "Fermer"
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Plus></Plus> Nouveau conseil
+                </div>
+              )}
+            </button>
+
+            {/* <p className="text-sm text-slate-600">
+                {getSortedMessages().length} conseil
+                {getSortedMessages().length > 1 ? "s" : ""}
+              </p> */}
           </div>
 
           <ul className="space-y-3">
