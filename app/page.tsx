@@ -19,7 +19,8 @@ export interface Message {
   createdAt: Date;
   categories: AdviceCategories;
   linkedinUrl?: string;
-  comments?: Comment[];
+  resourceUrl?: string;
+  comments: Comment[];
 }
 
 const initialMessages: Message[] = [
@@ -92,6 +93,7 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [showForm, setShowForm] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+  const [resourceUrl, setResourceUrl] = useState("");
   const [selectedCategory, setSelectedCategory] =
     useState<AdviceCategories>("Coding");
   const [sortBy, setSortBy] = useState<SortOption>("most-liked");
@@ -112,11 +114,14 @@ export default function Home() {
       likeCount: 0,
       createdAt: new Date(),
       categories: selectedCategory,
+      resourceUrl: resourceUrl.trim() || undefined,
+      comments: [],
     };
 
     setMessages([message, ...messages]);
 
     setNewMessage("");
+    setResourceUrl("");
     setSelectedCategory("Coding");
     setShowForm(false);
   };
@@ -203,6 +208,22 @@ export default function Home() {
                   rows={4}
                   required
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  Lien vers une ressource (optionnel)
+                </label>
+                <input
+                  type="url"
+                  value={resourceUrl}
+                  onChange={(e) => setResourceUrl(e.target.value)}
+                  placeholder="https://..."
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent"
+                />
+                <p className="mt-1 text-xs text-slate-500">
+                  Lien vers un article, vidéo ou ressource pertinente
+                </p>
               </div>
 
               <div className="flex gap-2 justify-end">
