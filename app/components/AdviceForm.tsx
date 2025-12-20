@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AdviceCategories } from "../page";
+import { AdviceCategories } from "../types/advice";
 
 interface AdviceFormData {
   message: string;
@@ -8,15 +8,33 @@ interface AdviceFormData {
 }
 
 interface AdviceFormProps {
-  onSubmit: (data: AdviceFormData) => void;
   onCancel: () => void;
+  studentId: number;
+  onSubmit: () => void;
 }
 
-export default function AdviceForm({ onSubmit, onCancel }: AdviceFormProps) {
+export default function AdviceForm({
+  onCancel,
+  studentId,
+  onSubmit,
+}: AdviceFormProps) {
   const [newMessage, setNewMessage] = useState("");
   const [resourceUrl, setResourceUrl] = useState("");
   const [selectedCategory, setSelectedCategory] =
     useState<AdviceCategories>("Coding");
+
+  const postMessage = async (advice: AdviceFormData, studentId: number) => {
+    const response = await fetch("/api/advices", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ advice, studentId }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,16 +43,18 @@ export default function AdviceForm({ onSubmit, onCancel }: AdviceFormProps) {
       return;
     }
 
-    onSubmit({
-      message: newMessage,
-      category: selectedCategory,
-      resourceUrl: resourceUrl.trim(),
-    });
-
-    // Reset form
     setNewMessage("");
     setResourceUrl("");
     setSelectedCategory("Coding");
+
+    const newAdvice: AdviceFormData = {
+      message: newMessage,
+      category: selectedCategory,
+      resourceUrl: resourceUrl,
+    };
+
+    postMessage(newAdvice, studentId);
+    onSubmit();
   };
 
   return (

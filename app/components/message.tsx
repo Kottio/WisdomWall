@@ -2,16 +2,24 @@
 
 import { useState } from "react";
 import { ThumbsUp, Linkedin, MessageCircle, Link } from "lucide-react";
-import { Advice } from "../page";
+import type { Advice } from "../types/advice";
 
 interface MessageCardProps {
   advice: Advice;
+  studentId: number | undefined;
+  refecth: () => void;
 }
 
-export default function MessageCard({ advice }: MessageCardProps) {
+export default function MessageCard({
+  advice,
+  studentId,
+  refecth,
+}: MessageCardProps) {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
-  const handleVote = () => {};
+  const likedByUser = studentId
+    ? advice.likes.some((like) => like.studentId === studentId)
+    : false;
 
   const getCategoryStyle = (category: string) => {
     const styles = {
@@ -23,6 +31,27 @@ export default function MessageCard({ advice }: MessageCardProps) {
     return (
       styles[category as keyof typeof styles] || "bg-gray-100 text-gray-700"
     );
+  };
+
+  const toggleLike = async (adviceId: number, studentId: number) => {
+    const response = await fetch(`/api/advices/${adviceId}/like`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ studentId }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      if (data) {
+        console.log(data.liked);
+        refecth();
+      }
+    }
+  };
+
+  const handleVote = () => {
+    if (studentId) {
+      toggleLike(advice.id, studentId);
+    }
   };
 
   return (
@@ -150,10 +179,18 @@ export default function MessageCard({ advice }: MessageCardProps) {
         <div className="flex flex-col items-center justify-start gap-2 pt-1">
           <button
             onClick={() => handleVote()}
-            className="group p-3 rounded-xl bg-slate-50 hover:bg-purple-50 transition-all duration-200 hover:scale-105 active:scale-95"
+            className={`group p-3 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 ${
+              likedByUser ? "bg-purple-400 " : "bg-slate-50 hover:bg-purple-50"
+            }`}
             aria-label="Voter pour ce conseil"
           >
-            <ThumbsUp className="w-6 h-6 text-slate-400 group-hover:text-purple-600 transition-colors" />
+            <ThumbsUp
+              className={`w-6 h-6 transition-colors ${
+                likedByUser
+                  ? "text-white"
+                  : "text-slate-400 group-hover:text-purple-600"
+              }`}
+            />
           </button>
           <span className="text-slate-600 text-base font-bold">
             {advice.likes.length}

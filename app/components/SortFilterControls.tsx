@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Advice } from "../page";
+import { Advice } from "../types/advice";
 import { getSortedMessages } from "../utils/messageUtils";
 
 interface SortFilterControlsProps {

@@ -1,6 +1,6 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import useSWR from "swr";
+import { useState } from "react";
 import { useSession } from "./lib/auth-client";
 import { useRouter } from "next/navigation";
 import MessageCard from "./components/message";
@@ -8,61 +8,9 @@ import SortFilterControls from "./components/SortFilterControls";
 import AdviceForm from "./components/AdviceForm";
 import { Plus } from "lucide-react";
 import { useStudentProfile } from "./hooks/useStudentProfile";
+import type { Advice } from "./types/advice";
 
-// interface StudentProfile {
-//   id: number;
-//   username: string;
-//   position: string;
-//   linkedinUrl: string | null;
-//   gitHubUrl: string | null;
-// }
-
-// Database interfaces (from API)
-export interface AdviceStudent {
-  id: number;
-  username: string;
-  position: string;
-  linkedinUrl: string | null;
-  gitHubUrl: string | null;
-}
-
-export interface AdviceLike {
-  id: number;
-  studentId: number;
-  adviceId: number;
-  createdAt: Date;
-}
-
-export interface AdviceComment {
-  id: number;
-  text: string;
-  createdAt: Date;
-  updatedAt: Date;
-  studentId: number;
-  adviceId: number;
-  student: {
-    username: string;
-  };
-}
-
-export interface Advice {
-  id: number;
-  message: string;
-  category: string;
-  resourceUrl: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  studentId: number;
-  student: AdviceStudent;
-  likes: AdviceLike[];
-  comments: AdviceComment[];
-}
-
-export type AdviceCategories =
-  | "Carreer"
-  | "Coding"
-  | "Design System"
-  | "Security";
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Home() {
   const { data: session, isPending } = useSession();
@@ -71,28 +19,19 @@ export default function Home() {
     session?.user?.id,
     isPending
   );
-  // const [messages, setMessages] = useState<Message[]>(initialMessages);
-
-  const [advices, setAdvices] = useState<Advice[]>([]);
+  const { data, mutate } = useSWR("/api/advices", fetcher);
+  const advices = data?.advices || [];
   const [filteredAdvices, setFilteredAdvices] = useState<Advice[]>([]);
-
   const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const response = await fetch("/api/advices");
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data);
-          setAdvices(data.advices);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchMessages();
-  }, []);
+  const handleAdviceSubmitted = () => {
+    setShowForm(false);
+    mutate();
+  };
+
+  const handleLike = () => {
+    mutate();
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -101,6 +40,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-slate-900">Wisdom Wall</h1>
+
             <p className="text-sm text-slate-500">Conseils Data</p>
           </div>
           <div className="flex items-center gap-3">
@@ -136,13 +76,13 @@ export default function Home() {
       <div className="max-w-5xl mx-auto px-6 py-8">
         {/* Form Section */}
 
-        {/*        
-        {showForm && (
+        {showForm && studentProfile && (
           <AdviceForm
-            onSubmit={handleAdviceSubmit}
             onCancel={() => setShowForm(false)}
+            studentId={studentProfile.id}
+            onSubmit={handleAdviceSubmitted}
           />
-        )} */}
+        )}
 
         {/* Messages Section */}
         <div>
@@ -168,7 +108,12 @@ export default function Home() {
 
           <ul className="space-y-3">
             {filteredAdvices.map((advice: Advice) => (
-              <MessageCard key={advice.id} advice={advice} />
+              <MessageCard
+                key={advice.id}
+                advice={advice}
+                studentId={studentProfile?.id}
+                refecth={handleLike}
+              />
             ))}
           </ul>
         </div>

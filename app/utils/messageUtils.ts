@@ -1,4 +1,4 @@
-import { Advice } from "../page";
+import { Advice } from "../types/advice";
 
 type SortOption = "most-liked" | "recent";
 type TimeLimit = "all-time" | "month";
