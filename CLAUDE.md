@@ -9,14 +9,16 @@ WisdomWall is a Next.js 16 application where students can share advice/tips with
 ## Essential Commands
 
 ### Development
+
 ```bash
-npm run dev              # Start Next.js dev server on localhost:3000
-npm run build            # Build for production
-npm run start            # Start production server
-npm run lint             # Run ESLint
+pnpm run dev              # Start Next.js dev server on localhost:3000
+pnpm run build            # Build for production
+pnpm run start            # Start production server
+pnpm run lint             # Run ESLint
 ```
 
 ### Database
+
 ```bash
 npx prisma migrate dev   # Create and apply new migration
 npx prisma migrate reset # Reset database and apply all migrations
@@ -53,12 +55,14 @@ Authentication is handled by **Better Auth** (NOT NextAuth):
 ### Application Structure
 
 **Route Layout**:
+
 - `/` - Main feed showing all advice posts with sort/filter controls
 - `/sign-in` - Sign in page
 - `/sign-up` - Sign up page
 - `/onboarding` - Student profile creation (required after sign-up)
 
 **Key Patterns**:
+
 - Client components use `"use client"` directive (Next.js App Router)
 - Session management via Better Auth's `useSession()` hook
 - Student profile fetched via `useStudentProfile()` custom hook
@@ -67,6 +71,7 @@ Authentication is handled by **Better Auth** (NOT NextAuth):
 ### Prisma Client Singleton
 
 The Prisma client is instantiated in `app/lib/prisma.ts` using the PostgreSQL adapter. This singleton should be imported as:
+
 ```typescript
 import prisma from "./lib/prisma";
 ```
@@ -82,6 +87,7 @@ API routes follow Next.js 13+ App Router conventions (`app/api/*/route.ts`):
 - `GET /api/student/me` - Get current user's Student profile
 
 When creating new API routes:
+
 1. Check authentication state when needed using Better Auth session
 2. Use Prisma's `include` to fetch related data (avoid N+1 queries)
 3. Return `NextResponse.json()` responses
@@ -89,6 +95,7 @@ When creating new API routes:
 ### Type Definitions
 
 Custom types are defined in `app/types/`:
+
 - `app/types/advice.ts` - Advice, AdviceStudent, AdviceLike, AdviceComment interfaces
 
 These mirror Prisma types but are used on the client side.
@@ -96,6 +103,7 @@ These mirror Prisma types but are used on the client side.
 ### Environment Variables
 
 Required in `.env`:
+
 ```
 DATABASE_URL=postgresql://...
 NEXT_PUBLIC_APP_URL=http://localhost:3000  # Used by Better Auth client

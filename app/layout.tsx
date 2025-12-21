@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Wisdom Wall - Partagez vos conseils",
-  description: "Un mur pour partager et voter sur des conseils de sagesse",
+  title: "kottioDev Pipeline Lab - Infrastructures Data",
+  description: "Laboratoire pour apprendre les infrastructures data - Partagez conseils et ressources",
 };
 
 export default function RootLayout({

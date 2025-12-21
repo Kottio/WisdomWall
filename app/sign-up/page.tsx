@@ -40,7 +40,7 @@ export default function SignUpPage() {
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-slate-900">Créer un compte</h1>
             <p className="text-sm text-slate-500 mt-1">
-              Rejoignez Wisdom Wall pour partager vos conseils
+              Rejoignez kottioDev Pipeline Lab et partagez vos connaissances
             </p>
           </div>
 

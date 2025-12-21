@@ -67,10 +67,10 @@ export default function OnboardingPage() {
         <div className="bg-white rounded-lg border border-slate-200 p-8 shadow-sm">
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-slate-900">
-              Bienvenue sur Wisdom Wall!
+              Bienvenue sur kottioDev Pipeline Lab!
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              Complétez votre profil pour commencer à partager vos conseils
+              Complétez votre profil pour rejoindre la communauté Data Engineering
             </p>
           </div>
 

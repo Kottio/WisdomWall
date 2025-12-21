@@ -3,6 +3,7 @@ import useSWR from "swr";
 import { useState } from "react";
 import { useSession } from "./lib/auth-client";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import MessageCard from "./components/message";
 import SortFilterControls from "./components/SortFilterControls";
 import AdviceForm from "./components/AdviceForm";
@@ -29,19 +30,25 @@ export default function Home() {
     mutate();
   };
 
-  const handleLike = () => {
-    mutate();
-  };
-
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Navigation Bar */}
       <nav className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-slate-900">Wisdom Wall</h1>
-
-            <p className="text-sm text-slate-500">Conseils Data</p>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/kottioDev/face.PNG"
+              alt="kottioDev Logo"
+              width={70}
+              height={70}
+              className="rounded-lg"
+            />
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">KottioDev</h1>
+              <p className="text-sm text-slate-500">
+                Apprendre les infrastructures data
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             {isPending || loadingProfile ? (
@@ -112,7 +119,7 @@ export default function Home() {
                 key={advice.id}
                 advice={advice}
                 studentId={studentProfile?.id}
-                refecth={handleLike}
+                refecth={mutate}
               />
             ))}
           </ul>

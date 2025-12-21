@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ThumbsUp, Linkedin, MessageCircle, Link } from "lucide-react";
 import type { Advice } from "../types/advice";
+import CommentCard from "./comment";
 
 interface MessageCardProps {
   advice: Advice;
@@ -51,6 +52,33 @@ export default function MessageCard({
   const handleVote = () => {
     if (studentId) {
       toggleLike(advice.id, studentId);
+    }
+  };
+
+  const addComment = async (
+    newComment: string,
+    studentId: number,
+    adviceId = advice.id
+  ) => {
+    const response = await fetch(`/api/advices/${adviceId}/comment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ newComment, studentId }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return true;
+    }
+  };
+
+  const handleAddComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    const added = await addComment(newComment, advice.studentId, advice.id);
+    if (added) {
+      console.log("posted");
+      refecth();
     }
   };
 
@@ -139,17 +167,7 @@ export default function MessageCard({
             <div className="mt-4 pt-4 border-t border-slate-200 space-y-3">
               {/* Liste des commentaires */}
               {advice.comments.map((comment) => (
-                <div key={comment.id} className="bg-slate-50 rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-slate-700 text-sm">
-                      {comment.student.username}
-                    </span>
-                    <span className="text-slate-400 text-xs">
-                      {comment.createdAt.toLocaleDateString("fr-FR")}
-                    </span>
-                  </div>
-                  <p className="text-slate-600 text-sm">{comment.text}</p>
-                </div>
+                <CommentCard key={comment.id} comment={comment}></CommentCard>
               ))}
 
               {/* Formulaire pour ajouter un commentaire */}
@@ -163,7 +181,7 @@ export default function MessageCard({
                 />
                 <button
                   onClick={() => {
-                    // TODO: Ajouter le commentaire
+                    addComment(newComment, advice.studentId, advice.id);
                     setNewComment("");
                   }}
                   className="mt-2 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors"
