@@ -103,7 +103,7 @@ export default function MessageCard({
               className="inline-flex items-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-sm font-medium transition-all mb-6 w-fit group"
             >
               <Link className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
-              <span>Voir la ressource</span>
+              <span>Voir le Lien</span>
               <svg
                 className="w-3 h-3 opacity-40 group-hover:opacity-70 group-hover:translate-x-0.5 transition-all"
                 fill="none"
@@ -130,11 +130,10 @@ export default function MessageCard({
                 href={advice.student.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:scale-110 transition-transform"
-                aria-label="Voir le profil LinkedIn"
-                title="Connecter sur LinkedIn"
+                aria-label="LinkedIn Profile"
+                className="text-slate-700 hover:text-blue-600 transition-colors"
               >
-                <Linkedin className="w-4 h-4 text-blue-500 fill-blue-500 opacity-80" />
+                <i className="bi bi-linkedin"></i>
               </a>
             )}
             <span className="text-slate-300">·</span>

@@ -1,13 +1,13 @@
 "use client";
 import useSWR from "swr";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useSession } from "./lib/auth-client";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import MessageCard from "./components/message";
 import SortFilterControls from "./components/SortFilterControls";
 import AdviceForm from "./components/AdviceForm";
-import { Plus } from "lucide-react";
+import { Plus, Linkedin } from "lucide-react";
 import { useStudentProfile } from "./hooks/useStudentProfile";
 import type { Advice } from "./types/advice";
 
@@ -21,7 +21,7 @@ export default function Home() {
     isPending
   );
   const { data, mutate } = useSWR("/api/advices", fetcher);
-  const advices = data?.advices || [];
+  const advices = useMemo(() => data?.advices || [], [data?.advices]);
   const [filteredAdvices, setFilteredAdvices] = useState<Advice[]>([]);
   const [showForm, setShowForm] = useState(false);
 
@@ -44,7 +44,27 @@ export default function Home() {
               className="rounded-lg"
             />
             <div>
-              <h1 className="text-xl font-bold text-slate-900">KottioDev</h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-bold text-slate-900">KottioDev</h1>
+                <a
+                  href="https://www.linkedin.com/in/thomas-cottiaux-data-consultant/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn Profile"
+                  className="text-slate-700 hover:text-blue-600 transition-colors"
+                >
+                  <i className="bi bi-linkedin"></i>
+                </a>
+                <a
+                  href="https://github.com/Kottio"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="GitHub Profile"
+                  className="text-slate-700 hover:text-slate-900 transition-colors"
+                >
+                  <i className="bi bi-github"></i>
+                </a>
+              </div>
               <p className="text-sm text-slate-500">
                 Apprendre les infrastructures data
               </p>

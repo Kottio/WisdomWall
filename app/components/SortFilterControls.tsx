@@ -17,7 +17,8 @@ export default function SortFilterControls({
   useEffect(() => {
     const filtered = getSortedMessages(advices, sortBy, timeLimit);
     onFilteredChange(filtered);
-  }, [advices, sortBy, timeLimit, onFilteredChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [advices, sortBy, timeLimit]);
 
   return (
     <div className="flex gap-3 items-center">

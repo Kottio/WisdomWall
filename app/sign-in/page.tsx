@@ -25,7 +25,10 @@ export default function SignInPage() {
 
       router.push("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Email ou mot de passe incorrect");
+      router.push("/signup");
+      setError(
+        err instanceof Error ? err.message : "Email ou mot de passe incorrect"
+      );
     } finally {
       setLoading(false);
     }
