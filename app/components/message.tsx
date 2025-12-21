@@ -72,13 +72,15 @@ export default function MessageCard({
     }
   };
 
-  const handleAddComment = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddComment = async () => {
     if (!newComment.trim()) return;
-    const added = await addComment(newComment, advice.studentId, advice.id);
-    if (added) {
-      console.log("posted");
-      refecth();
+    if (studentId) {
+      const added = await addComment(newComment, studentId, advice.id);
+      if (added) {
+        console.log("posted");
+        refecth();
+      }
+      setNewComment("");
     }
   };
 
@@ -181,8 +183,7 @@ export default function MessageCard({
                 />
                 <button
                   onClick={() => {
-                    addComment(newComment, advice.studentId, advice.id);
-                    setNewComment("");
+                    handleAddComment();
                   }}
                   className="mt-2 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors"
                 >
@@ -198,7 +199,7 @@ export default function MessageCard({
           <button
             onClick={() => handleVote()}
             className={`group p-3 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 ${
-              likedByUser ? "bg-purple-400 " : "bg-slate-50 hover:bg-purple-50"
+              likedByUser ? "bg-purple-500 " : "bg-slate-50 hover:bg-purple-50"
             }`}
             aria-label="Voter pour ce conseil"
           >

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import prisma from "@/app/lib/prisma";
 
 export async function POST(
   request: Request,
@@ -6,9 +7,19 @@ export async function POST(
 ) {
   const { newComment, studentId } = await request.json();
   const para = await params;
-  const { adviceId } = para;
+  const adviceId = parseInt(para.adviceId);
 
-  console.log(newComment, studentId, adviceId);
-
-  return NextResponse.json({ status: 201 });
+  const data = await prisma.adviceComment.create({
+    data: {
+      text: newComment,
+      studentId: studentId,
+      adviceId: adviceId,
+    },
+  });
+  if (data) {
+    console.log("posted");
+    return NextResponse.json({ status: 201 });
+  } else {
+    return NextResponse.json({ status: 400 });
+  }
 }

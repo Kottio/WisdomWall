@@ -32,7 +32,7 @@ export default function AdviceForm({
       body: JSON.stringify({ advice, studentId }),
     });
     if (response.ok) {
-      const data = await response.json();
+      onSubmit();
     }
   };
 
@@ -54,7 +54,6 @@ export default function AdviceForm({
     };
 
     postMessage(newAdvice, studentId);
-    onSubmit();
   };
 
   return (
