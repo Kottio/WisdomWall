@@ -10,7 +10,6 @@ import AdviceForm from "./components/AdviceForm";
 import { Plus } from "lucide-react";
 import { useStudentProfile } from "./hooks/useStudentProfile";
 import type { Advice } from "./types/advice";
-import { identify } from "./lib/events";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -98,6 +97,18 @@ export default function Home() {
                 </button>
               </>
             )}
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors"
+            >
+              {showForm ? (
+                "Fermer"
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Plus></Plus> Nouveau conseil
+                </div>
+              )}
+            </button>
           </div>
         </div>
       </nav>
@@ -121,19 +132,6 @@ export default function Home() {
               advices={advices}
               onFilteredChange={setFilteredAdvices}
             />
-
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors"
-            >
-              {showForm ? (
-                "Fermer"
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Plus></Plus> Nouveau conseil
-                </div>
-              )}
-            </button>
           </div>
 
           <ul className="space-y-3">

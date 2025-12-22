@@ -1,20 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import {
-  ThumbsUp,
-  MessageCircle,
-  Link,
-  Code2,
-  BarChart3,
-  Database,
-  PieChart,
-  Briefcase,
-  Wrench,
-} from "lucide-react";
+import { ThumbsUp, MessageCircle, Link } from "lucide-react";
 import type { Advice } from "../types/advice";
 import CommentCard from "./comment";
 import { track } from "../lib/events";
+import { getCategoryIcon, getCategoryStyle } from "../utils/categoryUtils";
 
 interface MessageCardProps {
   advice: Advice;
@@ -32,33 +23,6 @@ export default function MessageCard({
   const likedByUser = studentId
     ? advice.likes.some((like) => like.studentId === studentId)
     : false;
-
-  const getCategoryStyle = (category: string) => {
-    const styles = {
-      Programmation: "bg-blue-100 text-blue-700",
-      "Analyse de Données": "bg-emerald-100 text-emerald-700",
-      "Ingénierie Données": "bg-purple-100 text-purple-700",
-      Visualisation: "bg-pink-100 text-pink-700",
-      "Carrière & Portfolio": "bg-amber-100 text-amber-700",
-      "Outils & Workflow": "bg-slate-100 text-slate-700",
-    };
-    return (
-      styles[category as keyof typeof styles] || "bg-gray-100 text-gray-700"
-    );
-  };
-
-  const getCategoryIcon = (category: string) => {
-    const iconProps = { className: "w-3.5 h-3.5" };
-    const icons = {
-      Programmation: <Code2 {...iconProps} />,
-      "Analyse de Données": <BarChart3 {...iconProps} />,
-      "Ingénierie Données": <Database {...iconProps} />,
-      Visualisation: <PieChart {...iconProps} />,
-      "Carrière & Portfolio": <Briefcase {...iconProps} />,
-      "Outils & Workflow": <Wrench {...iconProps} />,
-    };
-    return icons[category as keyof typeof icons] || null;
-  };
 
   const toggleLike = async (adviceId: number, studentId: number) => {
     const response = await fetch(`/api/advices/${adviceId}/like`, {
