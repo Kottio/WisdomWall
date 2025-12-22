@@ -4,6 +4,8 @@ import { useState } from "react";
 import { ThumbsUp, Linkedin, MessageCircle, Link } from "lucide-react";
 import type { Advice } from "../types/advice";
 import CommentCard from "./comment";
+import { track } from "../lib/events";
+import { linkedin } from "better-auth/social-providers";
 
 interface MessageCardProps {
   advice: Advice;
@@ -43,15 +45,20 @@ export default function MessageCard({
     if (response.ok) {
       const data = await response.json();
       if (data) {
-        console.log(data.liked);
         refecth();
+        return data.liked;
       }
     }
   };
 
-  const handleVote = () => {
+  const handleVote = async () => {
     if (studentId) {
-      toggleLike(advice.id, studentId);
+      const liked = await toggleLike(advice.id, studentId);
+
+      track("Liked_advice", {
+        adviceId: advice.id,
+        likedStatus: liked,
+      });
     }
   };
 
@@ -97,6 +104,9 @@ export default function MessageCard({
           {/* Resource Link Button - Only show if resourceUrl exists */}
           {advice.resourceUrl && (
             <a
+              onClick={() => {
+                if (studentId) track("open_link", { adviceId: advice.id });
+              }}
               href={advice.resourceUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -127,6 +137,13 @@ export default function MessageCard({
             </span>
             {advice.student.linkedinUrl && (
               <a
+                onClick={() => {
+                  if (studentId)
+                    track("open_Linkdin", {
+                      adviceId: advice.id,
+                      linkedin_StudentId: advice.student.id,
+                    });
+                }}
                 href={advice.student.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -155,7 +172,14 @@ export default function MessageCard({
               {new Date(advice.createdAt).toLocaleDateString()}
             </span>
             <button
-              onClick={() => setShowComments(!showComments)}
+              onClick={() => {
+                setShowComments(!showComments);
+                if (studentId && !showComments) {
+                  track("open_comments", {
+                    adviceId: advice.id,
+                  });
+                }
+              }}
               className="flex items-center gap-1.5 text-slate-400 hover:text-slate-600 transition-colors"
             >
               <MessageCircle className="w-3.5 h-3.5" />

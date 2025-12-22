@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { identify } from "../lib/events";
 
 interface StudentProfile {
   id: number;
@@ -9,8 +10,13 @@ interface StudentProfile {
   gitHubUrl: string | null;
 }
 
-export function useStudentProfile(userId: string | undefined, isPending: boolean) {
-  const [studentProfile, setStudentProfile] = useState<StudentProfile | null>(null);
+export function useStudentProfile(
+  userId: string | undefined,
+  isPending: boolean
+) {
+  const [studentProfile, setStudentProfile] = useState<StudentProfile | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -27,6 +33,7 @@ export function useStudentProfile(userId: string | undefined, isPending: boolean
 
         if (data.student) {
           setStudentProfile(data.student);
+          identify(data.student.id);
         } else {
           router.push("/onboarding");
         }

@@ -7,19 +7,22 @@ import Image from "next/image";
 import MessageCard from "./components/message";
 import SortFilterControls from "./components/SortFilterControls";
 import AdviceForm from "./components/AdviceForm";
-import { Plus, Linkedin } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useStudentProfile } from "./hooks/useStudentProfile";
 import type { Advice } from "./types/advice";
+import { identify } from "./lib/events";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Home() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
+
   const { studentProfile, loading: loadingProfile } = useStudentProfile(
     session?.user?.id,
     isPending
   );
+
   const { data, mutate } = useSWR("/api/advices", fetcher);
   const advices = useMemo(() => data?.advices || [], [data?.advices]);
   const [filteredAdvices, setFilteredAdvices] = useState<Advice[]>([]);
