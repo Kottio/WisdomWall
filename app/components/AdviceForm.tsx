@@ -21,7 +21,7 @@ export default function AdviceForm({
   const [newMessage, setNewMessage] = useState("");
   const [resourceUrl, setResourceUrl] = useState("");
   const [selectedCategory, setSelectedCategory] =
-    useState<AdviceCategories>("Coding");
+    useState<AdviceCategories>("Programmation");
 
   const postMessage = async (advice: AdviceFormData, studentId: number) => {
     const response = await fetch("/api/advices", {
@@ -45,7 +45,7 @@ export default function AdviceForm({
 
     setNewMessage("");
     setResourceUrl("");
-    setSelectedCategory("Coding");
+    setSelectedCategory("Programmation");
 
     const newAdvice: AdviceFormData = {
       message: newMessage,
@@ -63,22 +63,34 @@ export default function AdviceForm({
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1.5">
+          <label className="block text-sm font-medium text-slate-700 mb-2">
             Catégorie *
           </label>
-          <select
-            value={selectedCategory}
-            onChange={(e) =>
-              setSelectedCategory(e.target.value as AdviceCategories)
-            }
-            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent cursor-pointer"
-            required
-          >
-            <option value="Coding">Coding</option>
-            <option value="Carreer">Carreer</option>
-            <option value="Design System">Design System</option>
-            <option value="Security">Security</option>
-          </select>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              "Programmation",
+              "Analyse de Données",
+              "Ingénierie Données",
+              "Visualisation",
+              "Carrière & Portfolio",
+              "Outils & Workflow",
+            ].map((category) => (
+              <button
+                key={category}
+                type="button"
+                onClick={() =>
+                  setSelectedCategory(category as AdviceCategories)
+                }
+                className={`px-3 py-2 text-sm font-medium rounded-md border-2 transition-all ${
+                  selectedCategory === category
+                    ? "bg-slate-900 text-white border-slate-900"
+                    : "bg-white text-slate-700 border-slate-200 hover:border-slate-400"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div>

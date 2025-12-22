@@ -91,7 +91,7 @@ async function main() {
     data: {
       message:
         "Toujours documenter vos pipelines de données. Votre futur vous remerciera!",
-      category: "Coding",
+      category: "Ingénierie Données",
       resourceUrl: "https://example.com/data-documentation",
       studentId: student1.id,
       createdAt: new Date("2025-12-10"),
@@ -102,7 +102,7 @@ async function main() {
     data: {
       message:
         "La qualité des données est plus importante que la quantité. Investissez dans la validation.",
-      category: "Coding",
+      category: "Analyse de Données",
       studentId: student3.id,
       createdAt: new Date("2025-12-15"),
     },
@@ -112,7 +112,7 @@ async function main() {
     data: {
       message:
         "Ne jamais sous-estimer l'importance du nettoyage des données avant l'analyse.",
-      category: "Carreer",
+      category: "Analyse de Données",
       studentId: student2.id,
       createdAt: new Date("2025-12-17"),
     },
@@ -122,7 +122,7 @@ async function main() {
     data: {
       message:
         "Apprenez SQL en profondeur. C'est la base de tout travail avec les données.",
-      category: "Coding",
+      category: "Analyse de Données",
       resourceUrl: "https://example.com/sql-guide",
       studentId: student1.id,
       createdAt: new Date("2025-12-18"),
@@ -133,7 +133,7 @@ async function main() {
     data: {
       message:
         "N'ayez pas peur de poser des questions. La communauté data est bienveillante.",
-      category: "Carreer",
+      category: "Carrière & Portfolio",
       studentId: student3.id,
       createdAt: new Date("2025-12-19"),
     },

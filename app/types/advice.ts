@@ -44,7 +44,9 @@ export interface Advice {
 
 // Advice categories
 export type AdviceCategories =
-  | "Carreer"
-  | "Coding"
-  | "Design System"
-  | "Security";
+  | "Programmation"
+  | "Analyse de Données"
+  | "Ingénierie Données"
+  | "Visualisation"
+  | "Carrière & Portfolio"
+  | "Outils & Workflow";
