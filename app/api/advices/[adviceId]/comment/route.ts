@@ -18,7 +18,7 @@ export async function POST(
   });
   if (data) {
     console.log("posted");
-    return NextResponse.json({ status: 201 });
+    return NextResponse.json({ status: 201, commentId: data.id });
   } else {
     return NextResponse.json({ status: 400 });
   }

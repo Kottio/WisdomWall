@@ -9,6 +9,29 @@ datasource db {
   provider = "postgresql"
 }
 
+model Event {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  eventName String
+  properties Json
+
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  adviceId Int?
+  advice   Advice? @relation(fields: [adviceId], references: [id], onDelete: Cascade)
+
+  sessionId String
+
+  @@index([eventName])
+  @@index([studentId])
+  @@index([adviceId])
+  @@index([sessionId])
+  @@index([createdAt])
+
+  @@map("event")
+}
+
 model Student {
   id          Int      @id @default(autoincrement())
   username    String   @unique
@@ -24,6 +47,7 @@ model Student {
   advices  Advice[]
   likes    AdviceLike[]
   comments AdviceComment[]
+  events Event[]
 
   @@map("student")
 }
@@ -41,7 +65,9 @@ model Advice {
 
   likes    AdviceLike[]
   comments AdviceComment[]
-   @@map("advice")
+  events   Event[]
+
+  @@map("advice")
 }
 
 model AdviceLike {

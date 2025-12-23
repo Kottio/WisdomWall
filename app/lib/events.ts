@@ -4,7 +4,7 @@ class AnalyticsTracker {
   private sessionId?: string;
   private studentId?: number;
 
-  private getOrCreateSessionId(): string {
+  private getOrCreateSessionId() {
     if (typeof window === "undefined") {
       return ""; // Return empty string for SSR
     }
@@ -18,10 +18,16 @@ class AnalyticsTracker {
 
   identify(studentId: number) {
     this.studentId = studentId;
-    if (!this.sessionId) this.getOrCreateSessionId();
+    if (!this.sessionId) {
+      this.sessionId = this.getOrCreateSessionId();
+    }
   }
 
-  async track(eventName: string, properties: EventProperties = {}) {
+  async track(
+    eventName: string,
+    adviceId: number | null,
+    properties: EventProperties = {}
+  ) {
     if (!this.studentId) {
       console.warn("Cannot Create event for non identified users");
       return;
@@ -30,11 +36,12 @@ class AnalyticsTracker {
     try {
       await fetch("/api/events/track", {
         method: "POST",
-        headers: { "Content-Type": "application/jon" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           studentId: this.studentId,
           sessionId: this.sessionId,
           eventName,
+          adviceId,
           properties,
         }),
       });

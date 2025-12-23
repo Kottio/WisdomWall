@@ -8,7 +8,7 @@ export default function OnboardingPage() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
 
-  const [username, setUsername] = useState(session?.user.name);
+  const [username, setUsername] = useState("");
   const [position, setPosition] = useState("");
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [gitHubUrl, setGitHubUrl] = useState("");
@@ -20,6 +20,12 @@ export default function OnboardingPage() {
       router.push("/sign-in");
     }
   }, [session, isPending, router]);
+
+  useEffect(() => {
+    if (session?.user?.name) {
+      setUsername(session.user.name);
+    }
+  }, [session]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

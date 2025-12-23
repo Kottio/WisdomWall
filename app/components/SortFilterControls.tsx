@@ -94,7 +94,7 @@ export default function SortFilterControls({
                 key={category}
                 onClick={() => {
                   setSelectedCategory(category);
-                  track("Filter_Categories", { category });
+                  track("category_filtered", null, { category });
                 }}
                 className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-all ${
                   selectedCategory === category

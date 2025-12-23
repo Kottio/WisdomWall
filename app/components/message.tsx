@@ -43,10 +43,7 @@ export default function MessageCard({
     if (studentId) {
       const liked = await toggleLike(advice.id, studentId);
 
-      track("Liked_advice", {
-        adviceId: advice.id,
-        likedStatus: liked,
-      });
+      track(liked ? "advice_liked" : "advice_unliked", advice.id);
     }
   };
 
@@ -62,17 +59,21 @@ export default function MessageCard({
     });
 
     if (response.ok) {
-      const data = await response.json();
+      const { commentId } = await response.json();
+      track("comment_created", advice.id, {
+        commentLength: newComment.length,
+        commentId,
+      });
       return true;
     }
+    return false;
   };
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
     if (studentId) {
-      const added = await addComment(newComment, studentId, advice.id);
-      if (added) {
-        console.log("posted");
+      const posted = await addComment(newComment, studentId, advice.id);
+      if (posted) {
         refecth();
       }
       setNewComment("");
@@ -93,7 +94,8 @@ export default function MessageCard({
           {advice.resourceUrl && (
             <a
               onClick={() => {
-                if (studentId) track("open_link", { adviceId: advice.id });
+                if (studentId)
+                  track("resource_clicked", advice.id);
               }}
               href={advice.resourceUrl}
               target="_blank"
@@ -127,9 +129,8 @@ export default function MessageCard({
               <a
                 onClick={() => {
                   if (studentId)
-                    track("open_Linkdin", {
-                      adviceId: advice.id,
-                      linkedin_StudentId: advice.student.id,
+                    track("linkedin_clicked", advice.id, {
+                      targetStudentId: advice.student.id,
                     });
                 }}
                 href={advice.student.linkedinUrl}
@@ -164,9 +165,7 @@ export default function MessageCard({
               onClick={() => {
                 setShowComments(!showComments);
                 if (studentId && !showComments) {
-                  track("open_comments", {
-                    adviceId: advice.id,
-                  });
+                  track("comments_expanded", advice.id);
                 }
               }}
               className="flex items-center gap-1.5 text-slate-400 hover:text-slate-600 transition-colors"
