@@ -4,7 +4,6 @@
 generator client {
   provider = "prisma-client-js"
   output   = "./generated/client"
-
 }
 
 datasource db {
@@ -12,9 +11,9 @@ datasource db {
 }
 
 model Event {
-  id Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  eventName String
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  eventName  String
   properties Json
 
   studentId Int
@@ -30,7 +29,6 @@ model Event {
   @@index([adviceId])
   @@index([sessionId])
   @@index([createdAt])
-
   @@map("event")
 }
 
@@ -49,7 +47,7 @@ model Student {
   advices  Advice[]
   likes    AdviceLike[]
   comments AdviceComment[]
-  events Event[]
+  events   Event[]
 
   @@map("student")
 }
@@ -97,9 +95,8 @@ model AdviceComment {
 
   adviceId Int
   advice   Advice @relation(fields: [adviceId], references: [id], onDelete: Cascade)
+
   @@map("advice_comment")
-
-
 }
 
 model User {
