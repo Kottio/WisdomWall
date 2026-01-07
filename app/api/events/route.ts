@@ -1,10 +1,28 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
+import { kv } from "@vercel/kv";
+
+async function checkRateLimit(ip: string): Promise<boolean> {
+  try {
+    const key = `ratelimit:events:${ip}`;
+    const count = await kv.incr(key); // Increment counter
+
+    // Set expiry on first request (1 hour = 3600 seconds)
+    if (count === 1) {
+      await kv.expire(key, 3600);
+    }
+
+    return count <= 50; // Allow up to 100 requests per hour
+  } catch (error) {
+    console.error("Rate limit check failed:", error);
+    return true; // If KV fails, allow request (fail open)
+  }
+}
 
 export async function GET(request: Request) {
   // API key Verification
   const apiKey = request.headers.get("x-api-key");
-  if (!apiKey || apiKey !== "wqjhdfiou2weqwddjikshdoiu") {
+  if (!apiKey || apiKey !== process.env.ANALYTICS_API_KEY) {
     return NextResponse.json(
       {
         error: "Unauthorized",
@@ -38,6 +56,23 @@ export async function GET(request: Request) {
     return NextResponse.json(
       { error: "Invalid date format. Use ISO format (e.g., 2025-01-01)" },
       { status: 400 }
+    );
+  }
+
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  const realIp = request.headers.get("x-real-ip");
+  const ip = forwardedFor?.split(",")[0] || realIp || "unknown";
+
+  console.log("This is the ip -----", ip);
+  // Check rate limit
+  const allowed = await checkRateLimit(ip);
+  if (!allowed) {
+    return NextResponse.json(
+      {
+        error: "Rate limit exceeded",
+        message: "Maximum 50 requests per hour. Please try again later.",
+      },
+      { status: 429 }
     );
   }
 
@@ -76,6 +111,8 @@ export async function GET(request: Request) {
     "x-api-key, Content-Type"
   );
 
+  response.headers.set("Cache-Control", "s-maxage=60, stale-while-revalidate");
+
   return response;
 }
 
@@ -89,41 +126,3 @@ export async function OPTIONS() {
     },
   });
 }
-
-//  const ip = request.ip ?? '127.0.0.1';
-//   const { success } = await ratelimit.limit(ip);
-//   if (!success) {
-//     return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
-//   }
-
-// const { searchParams } = new URL(request.url);
-// const startDate = searchParams.get("startDate");
-// const endDate = searchParams.get("endDate") || new Date().toISOString();
-
-//  headers: {
-//     'x-api-key': 'wqjhdfiou2weqwddjikshdoiu'
-//   }
-
-// import { kv } from "@vercel/kv";
-
-// async function checkRateLimit(identifier: string) {
-//   const key = `ratelimit:${identifier}`;
-//   const count = await kv.incr(key);
-
-//   if (count === 1) {
-//     await kv.expire(key, 3600); // 1 hour
-//   }
-
-//   return count <= 100; // 100 requests per hour
-// }3
-
-// // In your route:
-// const allowed = await checkRateLimit(ip);
-// if (!allowed) {
-//   return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
-// }
-
-//  curl "http://localhost:3000/api/events?from=2025-07-01&to=2026-01-07" \
-//     -H "x-api-key: wqjhdfiou2weqwddjikshdoiu"
-
-// process.env.ANALYTICS_API_KEY
