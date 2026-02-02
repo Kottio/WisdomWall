@@ -48,7 +48,7 @@ export async function GET(request: Request) {
   try {
     startDate = new Date(from);
     endDate = new Date(to);
-
+    //: TODO Change to get the last day
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
       throw new Error("Invalid date");
     }
